@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: `http://${window.location.hostname}:8000/api/v1`,
+  baseURL: 'https://rush0l-rohana-credit-backend.hf.space/api/v1',
 });
 
 apiClient.interceptors.request.use((config) => {
