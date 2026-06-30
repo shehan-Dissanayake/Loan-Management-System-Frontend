@@ -8,10 +8,12 @@ export default function Loans() {
   const [customers, setCustomers] = useState([]);
   const [customerId, setCustomerId] = useState('');
   const [principal, setPrincipal] = useState('');
+  const [disbursedDate, setDisbursedDate] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
 
   const loadData = () => {
     setLoading(true);
@@ -31,12 +33,30 @@ export default function Loans() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
-    createLoan({ customer_id: customerId, principal_amount: Number(principal) })
-      .then(() => { setCustomerId(''); setPrincipal(''); setShowForm(false); loadData(); })
+    createLoan({
+      customer_id: customerId,
+      principal_amount: Number(principal),
+      disbursed_date: disbursedDate || undefined,
+    })
+      .then(() => {
+        setCustomerId('');
+        setPrincipal('');
+        setDisbursedDate('');
+        setShowForm(false);
+        loadData();
+      })
       .catch((err) => setError(err.response?.data?.detail || err.message));
   };
 
-  const filtered = loans.filter((l) => filter === 'all' || l.status === filter);
+  const filtered = loans
+    .filter((l) => filter === 'all' || l.status === filter)
+    .filter((l) => {
+      if (!search.trim()) return true;
+      const q = search.trim().toLowerCase();
+      const shopName = customerName(l.customer_id).toLowerCase();
+      const loanNumber = l.loan_number ? String(l.loan_number) : '';
+      return shopName.includes(q) || loanNumber.includes(q);
+    });
 
   return (
     <>
@@ -64,17 +84,39 @@ export default function Loans() {
                 <label className="form-label">Principal (Rs)</label>
                 <input type="number" value={principal} onChange={(e) => setPrincipal(e.target.value)} placeholder="10000" required />
               </div>
+              <div className="form-group">
+                <label className="form-label">Disbursed date</label>
+                <input
+                  type="date"
+                  value={disbursedDate}
+                  onChange={(e) => setDisbursedDate(e.target.value)}
+                  title="Leave blank to use today's date"
+                />
+              </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', paddingBottom: '1rem' }}>
                 <button type="submit" className="btn btn-primary">Create</button>
                 <button type="button" className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
               </div>
             </div>
+            <p className="text-muted" style={{ fontSize: 12, marginTop: -4 }}>
+              Leave the date blank for a new loan disbursed today. Set a past date to add an existing/past loan into the system.
+            </p>
             {error && <p className="error-msg">{error}</p>}
           </form>
         </div>
       )}
 
       <div className="card">
+        <div style={{ marginBottom: '1rem', position: 'relative' }}>
+          <i className="ti ti-search" aria-hidden="true" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-hint)', fontSize: 16 }} />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by loan number or shop name..."
+            style={{ paddingLeft: '2rem' }}
+          />
+        </div>
+
         <div style={{ display: 'flex', gap: 6, marginBottom: '1rem' }}>
           {['all', 'active', 'overdue', 'completed', 'deactivated'].map((f) => (
             <button
@@ -91,14 +133,16 @@ export default function Loans() {
         {loading ? (
           <p className="text-muted">Loading...</p>
         ) : filtered.length === 0 ? (
-          <p className="text-muted">No loans in this category.</p>
+          <p className="text-muted">No loans match your search.</p>
         ) : (
           <table className="data-table">
             <thead>
               <tr>
+                <th>Loan #</th>
                 <th>Shop</th>
                 <th>Principal</th>
                 <th>Total payable</th>
+                <th>Disbursed</th>
                 <th>Due date</th>
                 <th>Status</th>
               </tr>
@@ -106,11 +150,13 @@ export default function Loans() {
             <tbody>
               {filtered.map((l) => (
                 <tr key={l.id}>
+                  <td className="text-muted">{l.loan_number ?? '—'}</td>
                   <td>
                     <Link to={`/loans/${l.id}`} style={{ fontWeight: 500 }}>{customerName(l.customer_id)}</Link>
                   </td>
                   <td>Rs {Number(l.principal_amount).toLocaleString()}</td>
                   <td>Rs {Number(l.total_payable).toLocaleString()}</td>
+                  <td className="text-muted">{l.disbursed_date}</td>
                   <td className="text-muted">{l.due_date}</td>
                   <td><span className={`badge badge-${l.status}`}>{l.status}</span></td>
                 </tr>
