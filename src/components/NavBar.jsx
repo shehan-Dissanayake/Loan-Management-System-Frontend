@@ -16,6 +16,9 @@ function NavBar() {
       <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>Customers</NavLink>
       <NavLink to="/loans" className={({ isActive }) => (isActive ? 'active' : '')}>Loans</NavLink>
       <NavLink to="/reports" className={({ isActive }) => (isActive ? 'active' : '')}>Reports</NavLink>
+      <NavLink to="/holidays" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <i className="ti ti-calendar-off" aria-hidden="true" /> Holidays
+      </NavLink>     
       <button onClick={handleLogout} className="logout-btn">Log out</button>
     </nav>
   );

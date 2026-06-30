@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Reports from './pages/Reports';
 import { useAuth } from './context/AuthContext';
 import Assistant from './pages/Assistant';
+import Holidays from './pages/Holidays';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -26,6 +27,7 @@ function App() {
       <Route path="/loans/:loanId" element={<ProtectedRoute><LoanDetail /></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
       <Route path="/assistant" element={<ProtectedRoute><Assistant /></ProtectedRoute>} />
+      <Route path="/holidays" element={<ProtectedRoute><Holidays /></ProtectedRoute>} />
     </Routes>
   );
 }
