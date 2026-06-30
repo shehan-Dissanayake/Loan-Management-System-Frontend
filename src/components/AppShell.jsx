@@ -40,6 +40,9 @@ export default function AppShell({ children }) {
           <NavLink to="/reports" className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')} onClick={closeMenu}>
             <i className="ti ti-chart-bar" aria-hidden="true" /> Reports
           </NavLink>
+          <NavLink to="/holidays" className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')} onClick={closeMenu}>
+            <i className="ti ti-calendar-off" aria-hidden="true" /> Holidays
+          </NavLink>
           <NavLink to="/assistant" className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')} onClick={closeMenu}>
             <i className="ti ti-robot" aria-hidden="true" /> Assistant
           </NavLink>
